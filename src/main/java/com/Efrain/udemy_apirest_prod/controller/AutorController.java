@@ -70,18 +70,46 @@ public class AutorController {
 
     // entrgea por id los registros con http:.../autores/1
     @GetMapping("/{id}")
-    public ResponseEntity<Autor> findById(@PathVariable Long id) {
+    public ResponseEntity<AutorDTO> findById(@PathVariable Long id) {
+
         Optional<Autor> autorOptional = autorService.findById(id);
-        return autorOptional.map(ResponseEntity:: ok).orElseGet(
+        return autorOptional.map(
+            autorDB-> {
+                AutorDTO autorDTO = new AutorDTO();
+                autorDTO.setId(autorDB.getId());
+                autorDTO.setNombre(autorDB.getNombre());
+                autorDTO.setApellido(autorDB.getApellido());
+                autorDTO.setTelefono(autorDB.getTelefono());
+                return ResponseEntity.ok(autorDTO);
+
+            }
+        
+        ).orElseGet(
             ()-> ResponseEntity.notFound().build()
         );
     }
 
     // entrgea por id los registros con http:.../autores/1
     @PutMapping
-    public ResponseEntity<Autor> update(@RequestBody Autor autor) {
+    public ResponseEntity<AutorDTO> update(@RequestBody AutorDTO autorDTO) {
+        //autor a autordto
+         Autor autor = new Autor();
+        autor.setId(autorDTO.getId());
+        autor.setNombre(autorDTO.getNombre());
+        autor.setApellido(autorDTO.getApellido());
+        autor.setTelefono(autorDTO.getTelefono());
+
         return autorService.update(autor).map(
-            ResponseEntity::ok
+
+        autorUpdate ->{
+            AutorDTO autorDTOUpdate = new AutorDTO();
+            autorDTOUpdate.setId(autorDTOUpdate.getId());
+            autorDTOUpdate.setNombre(autorDTOUpdate.getNombre());
+            autorDTOUpdate.setApellido(autorDTOUpdate.getApellido());
+            autorDTOUpdate.setTelefono(autorDTOUpdate.getTelefono());
+            return ResponseEntity.ok(autorDTOUpdate);
+        }
+            
         ).orElseGet(
             ()-> ResponseEntity.notFound().build());
         
